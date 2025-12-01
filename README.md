@@ -1,4 +1,4 @@
-# VDIG: VLM Dashboard Insight Generator  
+# VDIG: VLMs for Dashboard Insight Generation  
 
 ---
 
