@@ -54,10 +54,6 @@ const styles = {
   },
 };
 
-styles.buttonHover = {
-  background: "#4338ca",
-};
-
 // ------------------------- RAW GITHUB README URL -------------------------
 
 const README_URL =
