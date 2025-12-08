@@ -42,7 +42,7 @@ const styles: Record<string, CSSProperties> = {
   },
   button: {
     padding: "12px 24px",
-    background: "#4f46e5",
+    background: "#3a6ad6",
     border: "none",
     borderRadius: "8px",
     color: "#fff",
@@ -87,8 +87,8 @@ export default function HomePage() {
           <Link href="/upload">
             <button
               style={styles.button}
-              onMouseOver={(e) => (e.currentTarget.style.background = "#4338ca")}
-              onMouseOut={(e) => (e.currentTarget.style.background = "#4f46e5")}
+              onMouseOver={(e) => (e.currentTarget.style.background = "#23499d")}
+              onMouseOut={(e) => (e.currentTarget.style.background = "#3a6ad6")}
             >
               Go to Upload Form
             </button>

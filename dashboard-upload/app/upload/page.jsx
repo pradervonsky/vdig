@@ -65,6 +65,8 @@ export default function UploadPage() {
 
           <button
             style={styles.button}
+            onMouseOver={(e) => (e.currentTarget.style.background = "#23499d")}
+            onMouseOut={(e) => (e.currentTarget.style.background = "#3a6ad6")}
             onClick={() => {
               setSubmitted(false);
               setFileName("No file chosen");
@@ -132,7 +134,10 @@ export default function UploadPage() {
           <label style={styles.label}>Date</label>
           <input type="date" name="date" required style={styles.input} />
 
-          <button type="submit" disabled={loading} style={styles.button}>
+          <button type="submit" disabled={loading} style={styles.button}
+              onMouseOver={(e) => (e.currentTarget.style.background = "#23499d")}
+              onMouseOut={(e) => (e.currentTarget.style.background = "#3a6ad6")}
+          >
             {loading ? "Uploading..." : "Upload"}
           </button>
         </form>
@@ -210,12 +215,13 @@ const styles = {
   },
   button: {
     padding: "12px",
-    background: "#4f46e5",
+    background: "#3a6ad6",
     border: "none",
     borderRadius: "8px",
     color: "#fff",
     fontSize: "16px",
     fontWeight: "600",
     cursor: "pointer",
+    transition: "background 0.2s",
   },
 };
