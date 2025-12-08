@@ -17,60 +17,110 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Convert file into a buffer
     const fileBuffer = Buffer.from(await file.arrayBuffer());
     const fileName = `${date}_${file.name}`;
 
-    // Supabase admin client
+
+    // ------------------------------
+    // INIT SUPABASE SERVICE CLIENT
+    // ------------------------------
     const supabase = createClient(
       process.env.SUPABASE_URL!,
       process.env.SUPABASE_SERVICE_ROLE!
     );
 
-    // Upload to Supabase Storage
-    const { data, error } = await supabase.storage
+
+    // ------------------------------
+    // CHECK DUPLICATE IN DATABASE
+    // ------------------------------
+    const { data: existing, error: existingErr } = await supabase
+      .from("dashboard_images")
+      .select("id")
+      .eq("dashboard_date", date)
+      .maybeSingle();
+
+    if (existing) {
+      return NextResponse.json(
+        {
+          error: "Duplicate entry",
+          message: `A dashboard for ${date} already exists`,
+        },
+        { status: 409 }
+      );
+    }
+
+
+    // ------------------------------
+    // UPLOAD FILE (no overwrite)
+    // ------------------------------
+    const { data: uploaded, error: uploadErr } = await supabase.storage
       .from("dashboards")
       .upload(fileName, fileBuffer, {
         contentType: file.type,
-        upsert: true,
+        upsert: false, // ← DO NOT OVERWRITE
       });
 
-    if (error) {
-      console.error("Supabase upload error:", error.message);
+    if (uploadErr) {
+      console.error("Upload error:", uploadErr);
+      return NextResponse.json({ error: "Supabase upload failed" }, { status: 500 });
+    }
+
+
+    // ------------------------------
+    // INSERT INTO dashboard_images
+    // ------------------------------
+    const { data: newRow, error: insertErr } = await supabase
+      .from("dashboard_images")
+      .insert({
+        filename: fileName,
+        storage_path: uploaded?.path,
+        dashboard_date: date,
+        submitted_at: new Date(),
+      })
+      .select()
+      .single();
+
+    if (insertErr) {
+      console.error("DB insert error:", insertErr);
+
+      // Remove uploaded file if DB insert failed:
+      await supabase.storage.from("dashboards").remove([fileName]);
+
       return NextResponse.json(
-        { error: "Supabase upload failed" },
+        { error: "Database insert failed" },
         { status: 500 }
       );
     }
 
-    // 🔥 CALL N8N WEBHOOK AFTER SUCCESSFUL UPLOAD
+
+    // ------------------------------
+    // SEND TO N8N WEBHOOK
+    // ------------------------------
     const webhookUrl = process.env.N8N_WEBHOOK_URL;
 
     if (webhookUrl) {
       await fetch(webhookUrl, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           message: "upload_complete",
+          dashboard_image_id: newRow.id,
           fileName,
-          supabasePath: data?.path,
+          supabasePath: uploaded?.path,
           date,
         }),
       });
     }
 
-    // Respond to browser
+
     return NextResponse.json({
       success: true,
-      path: data?.path,
+      dashboard_image_id: newRow.id,
+      path: uploaded?.path,
     });
+
   } catch (err) {
     console.error("Route error:", err);
-    return NextResponse.json(
-      { error: "Server error" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Server error" }, { status: 500 });
   }
 }
