@@ -117,6 +117,7 @@ export async function POST(req: NextRequest) {
       success: true,
       dashboard_image_id: newRow.id,
       path: uploaded?.path,
+      publicUrl: `${process.env.SUPABASE_URL}/storage/v1/object/public/dashboards/${uploaded?.path}`,
     });
 
   } catch (err) {

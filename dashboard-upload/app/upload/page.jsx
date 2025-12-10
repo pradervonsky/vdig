@@ -4,6 +4,7 @@ import { useState } from "react";
 export default function UploadPage() {
   const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [previewUrl, setPreviewUrl] = useState(null);
   const [fileName, setFileName] = useState("No file chosen");
 
   const handleUpload = async (e) => {
@@ -34,6 +35,7 @@ export default function UploadPage() {
       body: formData,
     });
 
+    const result = await res.json();
     setLoading(false);
 
     if (!res.ok) {
@@ -41,8 +43,20 @@ export default function UploadPage() {
       return;
     }
 
+    // Save the preview URL
+    setPreviewUrl(result.publicUrl);
+
     setSubmitted(true);
-  };
+
+        setLoading(false);
+
+        if (!res.ok) {
+          alert("Upload failed!");
+          return;
+        }
+
+        setSubmitted(true);
+      };
 
   // -----------------------------------------------------
   // SUCCESS SCREEN
@@ -63,6 +77,19 @@ export default function UploadPage() {
             Your dashboard screenshot has been successfully uploaded.
           </p>
 
+          {previewUrl && (
+            <img
+              src={previewUrl}
+              alt="Uploaded dashboard"
+              style={{
+                width: "100%",
+                borderRadius: "10px",
+                marginBottom: "20px",
+                border: "1px solid #444",
+              }}
+            />
+          )}
+
           <button
             style={styles.button}
             onMouseOver={(e) => (e.currentTarget.style.background = "#23499d")}
@@ -70,6 +97,7 @@ export default function UploadPage() {
             onClick={() => {
               setSubmitted(false);
               setFileName("No file chosen");
+              setPreviewUrl(null);
             }}
           >
             Submit another response
