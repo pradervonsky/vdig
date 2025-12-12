@@ -11,7 +11,8 @@ The system combines:
 - **Human-in-the-loop step** (to approve AI-generated insights via Telegram)
 - **Daily dashboard simulation**
 
-VBIG serves as the applied component of a broader goal: 
+VBIG serves as the applied component of a broader goal:
+
 **Embedding lightweight AI assistants into enterprise BI systems to improve clarity, speed, and decision support.**
 
 ---
