@@ -2,6 +2,8 @@
 
 ---
 
+![image](https://github.com/pradervonsky/vbig/blob/main/vbig-workflow.png)
+
 **VBIG** is a prototype system that explores how **small Vision-Language Models (≤3B parameters)** can augment business intelligence workflows by generating **concise, human-readable insights from BI dashboards**.
 
 The system combines:
